@@ -12,7 +12,7 @@ from apsjournals.web.constants import EndPoint
 
 # Info namedtuples for storing intermediate scraping results
 VolumeInfo = collections.namedtuple('VolumeInfo', 'url num start end')
-IssueInfo = collections.namedtuple('IssueInfo', 'url name label')
+IssueInfo = collections.namedtuple('IssueInfo', 'url num label')
 DividerInfo = collections.namedtuple('DividerInfo', 'name')
 ArticleInfo = collections.namedtuple('ArticleInfo', 'name author teaser url pdf_url')
 SectionInfo = collections.namedtuple('SectionInfo', 'name articles')
@@ -62,7 +62,7 @@ class IssueIndexScraper(Scraper):
         _vol = [v for v in vols if int(v.css('h4::attr(id)').extract_first()[1:]) == volume][0]
         issues = _vol.css('div[class=volume-issue-list]').css('li')
         return [IssueInfo(i.css('a::attr(href)').extract_first(), 
-                          i.css('a::text').extract_first(),
+                          int(i.css('a::text').extract_first().split(' ')[-1]),
                           i.css('li::text').extract_first()) for i in issues]
 
 
