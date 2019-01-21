@@ -4,6 +4,8 @@ _A pythonic interface for browsing APS_
 The `apsjournals` library is a collection of tools used for exploring American 
 Physical Society publications via python. 
 
+Test Result: [![CircleCI](https://circleci.com/gh/JWKennington/apsjournals/tree/master.svg?style=svg)](https://circleci.com/gh/JWKennington/apsjournals/tree/master)
+
 ## Motivation
 Admittedly, the APS website is well-built. Why `apsjournals` then? 
 1. The APS website does not offer an official API. This library offers a set of usable abstractions 
