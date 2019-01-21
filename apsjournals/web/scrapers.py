@@ -28,7 +28,7 @@ class Scraper:
     def __init__(self, endpoint: EndPoint):
         self.endpoint = endpoint
 
-    def extract(self, source: str):
+    def extract(self, source: str, **kwargs):
         raise NotImplementedError
 
     def get(self, **kwargs):
@@ -36,14 +36,14 @@ class Scraper:
 
     def load(self, **kwargs):
         source = self.get(**kwargs)
-        return self.extract(source)
+        return self.extract(source, **kwargs)
 
 
 class VolumeIndexScraper(Scraper):
     def __init__(self):
         super().__init__(endpoint=EndPoint.Volume)
 
-    def extract(self, source) -> typing.List[VolumeInfo]:
+    def extract(self, source, **kwargs) -> typing.List[VolumeInfo]:
         s = scrapy.Selector(text=source)
         vols = s.css('div[class=volume-issue-list]')
         info = [(v.css('a::attr(href)').extract()[0], v.css('small::text').extract()[0]) for v in vols]
@@ -55,7 +55,8 @@ class IssueIndexScraper(Scraper):
     def __init__(self):
         super().__init__(endpoint=EndPoint.Issue)
 
-    def extract(self, source) -> typing.List[IssueInfo]:
+    def extract(self, source, **kwargs) -> typing.List[IssueInfo]:
+        volume = kwargs['volume']
         s = scrapy.Selector(text=source)
         vols = s.css('div[class=volume-issue-list]')
         _vol = [v for v in vols if int(v.css('h4::attr(id)').extract_first()[1:]) == volume][0]
@@ -87,9 +88,12 @@ class IssueScraper(Scraper):
         else:
             raise ValueError('unknown tag {}'.format(tag))
     
-    def extract(self, source: str) -> typing.List[typing.Union[DividerInfo, ArticleInfo, SectionInfo]]:
+    def extract(self, source: str, **kwargs) -> typing.List[typing.Union[DividerInfo, ArticleInfo, SectionInfo]]:
         sel = scrapy.Selector(text=source)
-        results = sel.css('div[class="search-results"]')[0]
+        results = sel.css('div[class="search-results"]')
+        if len(results) == 0:
+            return []
+        results = results[0]
         items = results.xpath('(h2|div|section)')
         parsed = [self._extract_issue_item(i) for i in items]
         return parsed
