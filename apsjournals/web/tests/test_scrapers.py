@@ -63,7 +63,7 @@ class ScraperTests(unittest.TestCase):
         with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Volume)):
             s = scrapers.IssueIndexScraper()
             info = s.load(journal='prl', volume=121, issue=6)
-            self.assertEqual(info[0], scrapers.IssueInfo(url='https://journals.aps.org/prl/issues/121/1', name='Issue 1', label=' 6 July 2018 (010401 — 019901)'))
+            self.assertEqual(info[0], scrapers.IssueInfo(url='https://journals.aps.org/prl/issues/121/1', num=1, label=' 6 July 2018 (010401 — 019901)'))
 
     def test_issue_scraper(self):
         with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Issue)):
