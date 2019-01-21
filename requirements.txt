@@ -2,4 +2,3 @@ mock
 nose
 requests
 scrapy
-xunit
