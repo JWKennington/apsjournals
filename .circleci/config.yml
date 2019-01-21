@@ -48,6 +48,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
+            mkdir ./test-reports
             nosetests --with-xunit --xunit-file ./test-reports/results.xml
 #
 #      - store_artifacts:
