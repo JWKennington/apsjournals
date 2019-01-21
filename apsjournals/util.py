@@ -6,9 +6,28 @@ import datetime
 
 
 def month_name_to_num(m: str):
+    """Convert a month name to a number
+
+    Args:
+        m:
+            str, the name of the month
+
+    Returns:
+        int, the month number
+    """
     return datetime.datetime.strptime(m, '%B').month
 
+
 def parse_start_end(tr: str):
+    """Parse the start and end date from a string
+
+    Args:
+        tr:
+            str, the time range
+
+    Returns:
+        Tuple[datetime.date, datetime.date]
+    """
     start, end = tr.split(' - ')
     if end == 'Present':
         year = datetime.date.today().year

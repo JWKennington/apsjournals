@@ -19,6 +19,17 @@ SectionInfo = collections.namedtuple('SectionInfo', 'name articles')
 
 
 def get_aps(url: str, **kwargs):
+    """Wrapper around requests.get for APS specific GET requests
+
+    Args:
+        url:
+            str, the URL string
+        kwargs:
+            dict of get request parmeters
+
+    Returns:
+        str or bytes, the content of the get request
+    """
     response = requests.get(url=url, params=kwargs)
     # TODO add error handling and authentication
     return response.content
@@ -26,20 +37,39 @@ def get_aps(url: str, **kwargs):
 
 class Scraper:
     def __init__(self, endpoint: EndPoint):
+        """Base class for Scrapers
+        
+        Args:
+            endpoint: 
+                Url, the formattable URL string
+        """
         self.endpoint = endpoint
 
     def extract(self, source: str, **kwargs):
+        """Base method for extracting info from raw source string
+
+        Args:
+            source: 
+                str, the html string to be parsed
+            **kwargs: 
+
+        Returns:
+            List[Union[VolumeInfo, ArticleInfo]]
+        """
         raise NotImplementedError
 
     def get(self, **kwargs):
+        """Get request wrapper"""
         return get_aps(url=self.endpoint.format(**kwargs))
 
     def load(self, **kwargs):
+        """Load the info from raw source"""
         source = self.get(**kwargs)
         return self.extract(source, **kwargs)
 
 
 class VolumeIndexScraper(Scraper):
+    """Specific scraper for building an index of available volumes"""
     def __init__(self):
         super().__init__(endpoint=EndPoint.Volume)
 
@@ -52,6 +82,7 @@ class VolumeIndexScraper(Scraper):
 
 
 class IssueIndexScraper(Scraper):
+    """Specific scraper for building an index of available issues"""
     def __init__(self):
         super().__init__(endpoint=EndPoint.Issue)
 
@@ -67,6 +98,7 @@ class IssueIndexScraper(Scraper):
 
 
 class IssueScraper(Scraper):
+    """Specific scraper for extracting articles from an issue"""
     def __init__(self):
         super().__init__(endpoint=EndPoint.Issue)
 

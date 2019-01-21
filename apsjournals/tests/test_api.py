@@ -57,5 +57,5 @@ class IssueTests(unittest.TestCase):
     def test_contents(self):
         with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Issue)):
             contents = self.i.contents
-        self.assertEqual(contents, ())
+        self.assertEqual(repr(contents), "[Section(HIGHLIGHTED ARTICLES, 6 members), Section(LETTERS, 10 members)]")
 
