@@ -22,8 +22,10 @@ class Journal:
     @property
     def volumes(self) -> typing.List[int]:
         if not self._volumes:
-            for info in scrapers.journal_index(self.url_path):
-                self._volumes[info.num] = Volume(journal=self, num=info.num, start=info.start, end=info.end)
+            s = scrapers.VolumeIndexScraper()
+            info = s.load(journal=self.url_path, volume=None)
+            for i in info:
+                self._volumes[i.num] = Volume(journal=self, num=i.num, start=i.start, end=i.end)
         return list(self._volumes.keys())
 
     def volume(self, n: int):

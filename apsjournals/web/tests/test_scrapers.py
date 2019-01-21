@@ -31,14 +31,16 @@ def get_aps_static(url: str, ep: EndPoint):
 class StaticTests(unittest.TestCase):
     def test_get_params_from_url(self):
         url = EndPoint.Volume.format(journal='prl', volume=121)
-        self.assertEqual(get_params_from_url(url), ('prl', '121'))
+        self.assertEqual(get_params_from_url(url, EndPoint.Volume), ('prl', '121'))
 
     def test_get_aps_static(self):
-        source = get_aps_static('prl', 121)
+        url = EndPoint.Volume.format(journal='prl', volume=121)
+        source = get_aps_static(url, EndPoint.Volume)
         self.assertEqual(source[:20], "<!DOCTYPE html>\n<!--")
 
     def test_get_aps_static_issue(self):
-        source = get_aps_static('prl', 121, 6)
+        url = EndPoint.Issue.format(journal='prl', volume=121, issue=6)
+        source = get_aps_static(url, EndPoint.Issue)
         self.assertEqual(source[:20], "<!DOCTYPE html>\n<!--")
 
 
@@ -51,6 +53,9 @@ class ScraperTests(unittest.TestCase):
     def test_volume_index_scraper(self):
         with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Volume)):
             s = scrapers.VolumeIndexScraper()
+            info = s.load(journal='prl', volume=None)
+            self.assertEqual(info[0], scrapers.VolumeInfo(url='https://journals.aps.org/prl/issues/122', num=122, start=datetime.date(2019, 1, 1), end=datetime.date(2019, 1, 1)))
+
             info = s.load(journal='prl', volume=121)
             self.assertEqual(info[0], scrapers.VolumeInfo(url='https://journals.aps.org/prl/issues/122', num=122, start=datetime.date(2019, 1, 1), end=datetime.date(2019, 1, 1)))
 
