@@ -2,16 +2,16 @@
 """
 
 
-from setuptools import setup, find_packages
-from apsjournals import __version__
+import setuptools
+import apsjournals
 
 
-setup(name='apsjournals',
-      version=__version__,
-      description='A pythonic interface for APS publications',
-      url='http://github.com/JWKennington/apsjournals',
-      author='Jim Kennington',
-      author_email='jameswkennington@gmail.com',
-      license='MIT',
-      packages=find_packages(),
-      zip_safe=False)
+setuptools.setup(name='apsjournals',
+                 version=apsjournals.__version__,
+                 description='A pythonic interface for APS publications',
+                 url='http://github.com/JWKennington/apsjournals',
+                 author='James W. Kennington',
+                 author_email='jameswkennington@gmail.com',
+                 license='MIT',
+                 packages=setuptools.find_packages(),
+                 zip_safe=False)
