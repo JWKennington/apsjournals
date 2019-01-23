@@ -5,7 +5,7 @@ import mock
 import unittest
 from apsjournals import api
 from apsjournals.web.constants import EndPoint
-from apsjournals.web.tests.test_scrapers import get_aps_static
+from tests.test_scrapers import get_aps_static
 
 
 class JournalTests(unittest.TestCase):
@@ -58,4 +58,14 @@ class IssueTests(unittest.TestCase):
         with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Issue)):
             contents = self.i.contents
         self.assertEqual(repr(contents), "[Section(HIGHLIGHTED ARTICLES, 6 members), Section(LETTERS, 10 members)]")
+        
+
+class ArticleTests(unittest.TestCase):
+    def setUp(self):
+        self.j = api.Journal('PRL', 'prl', 'PRL Desc')
+        with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Volume)):
+            self.v = self.j.volume(121)
+
+        with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Volume)):
+            self.i = self.v.issue(6)
 
