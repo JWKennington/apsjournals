@@ -69,3 +69,13 @@ class ArticleTests(unittest.TestCase):
         with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Volume)):
             self.i = self.v.issue(6)
 
+        with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Issue)):
+            self.contents = self.i.contents
+        self.a = self.contents[0].members[0]
+
+    def test_article_repr(self):
+        self.assertEqual(str(self.a), "Article('Magnetic Levitation Stabilized by Streaming Fluid Flows')")
+
+    def test_url(self):
+        self.assertEqual(self.a.url, "https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.121.064502")
+        self.assertEqual(self.a.pdf_url, "https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.121.064502")
