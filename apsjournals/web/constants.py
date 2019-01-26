@@ -83,3 +83,4 @@ class EndPoint(Url, enum.Enum):
                                                                                                 param_journal=URLParameter.Journal, 
                                                                                                 param_volume=URLParameter.Volume, 
                                                                                                 param_issue=URLParameter.Issue))
+    Login = Url('{root}/login'.format(root=URL.Root))

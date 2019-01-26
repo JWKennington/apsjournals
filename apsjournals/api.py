@@ -20,6 +20,7 @@ import datetime
 import itertools
 import typing
 from apsjournals.web import scrapers
+from apsjournals import pdf
 
 
 class Journal:
@@ -138,7 +139,7 @@ class Issue:
         """
         self.vol = vol
         self.num = num
-        self._contents = []
+        self.__contents = None
 
     def __repr__(self):
         return "Issue({!r}, {:d}, {:d})".format(self.journal.name, self.vol.num, self.num)
@@ -148,17 +149,20 @@ class Issue:
         return self.vol.journal
 
     @property
-    def contents(self):
+    def _contents(self):
         """Load the contents of the Issue, returning a list of Sections and Articles
         
         Returns:
             List[Union[Section, Article]]
         """
-        if not self._contents:
+        if not self.__contents:
             s = scrapers.IssueScraper()
             info = s.load(journal=self.journal.url_path, volume=self.vol.num, issue=self.num)
-            self._contents = parse_contents_from_info(info, issue=self)
-        return self._contents
+            self.__contents = parse_contents_from_info(info, issue=self)
+        return self.__contents
+
+    def contents(self, include_level: bool=False):
+        return traverse_issue_contents(self, include_level=include_level)
 
     @property
     def articles(self):
@@ -167,7 +171,11 @@ class Issue:
                 return [x]
             elif isinstance(x, Section):
                 return list(itertools.chain.from_iterable([extract_articles(m) for m in x.members]))
-        return list(itertools.chain.from_iterable([extract_articles(c) for c in self.contents]))
+        return list(itertools.chain.from_iterable([extract_articles(c) for c in self._contents]))
+
+    def pdf(self, out_file: str):
+        doc = pdf.ApsPDF(self, out_file)
+        doc.build()
 
 
 class Author:
@@ -246,6 +254,9 @@ class Article:
     def journal(self):
         return self.issue.vol.journal
 
+    def pdf(self, filepath: str):
+        scrapers.download_pdf(self.pdf_url, out_file=filepath)
+
 
 def parse_contents_from_info(info: typing.List[typing.Union[scrapers.DividerInfo, scrapers.SectionInfo, scrapers.ArticleInfo]], issue: Issue) -> typing.List[Section]:
     """Convert an iterable of raw web-scraped information into api objects.
@@ -279,3 +290,28 @@ def parse_contents_from_info(info: typing.List[typing.Union[scrapers.DividerInfo
         else:
             raise ValueError('Unable to parse contents from type {}'.format(type(i)))
     return contents
+
+
+def traverse_issue_contents(x, level: int=0, include_level: bool=True):
+    """Traverse the issue contents
+
+    Args:
+        x: 
+            Issue, Section, or Article
+        level:
+            int, default 0 the level of nested 
+
+    Returns:
+        Generator
+    """
+    if isinstance(x, Issue):
+        for m in x._contents:
+            yield from traverse_issue_contents(m, level=level + 1, include_level=include_level)
+    elif isinstance(x, Section):
+        yield ((level, x) if include_level else x)
+        for m in x.members:
+            yield from traverse_issue_contents(m, level=level + 1, include_level=include_level)
+    elif isinstance(x, Article):
+        yield ((level, x) if include_level else x)
+    else:
+        raise ValueError('Unable to traverse object of type: {}'.format(type(x)))

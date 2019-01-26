@@ -7,7 +7,8 @@ import requests
 import scrapy
 import typing
 from apsjournals import util
-from apsjournals.web.constants import EndPoint
+from apsjournals.web import auth
+from apsjournals.web.constants import EndPoint, URL
 
 
 # Info namedtuples for storing intermediate scraping results
@@ -16,6 +17,23 @@ IssueInfo = collections.namedtuple('IssueInfo', 'url num label')
 DividerInfo = collections.namedtuple('DividerInfo', 'name')
 ArticleInfo = collections.namedtuple('ArticleInfo', 'name author teaser url pdf_url')
 SectionInfo = collections.namedtuple('SectionInfo', 'name articles')
+
+
+DOWNLOAD_HEADERS = {
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Accept-Language': 'en-US,en;q=0.9,ru;q=0.8',
+    'Connection': 'keep-alive',
+    'Host': 'journals.aps.org',
+    'If-None-Match': 'W/"804c52e955d740670082c7a2220de7a57143790a"',
+    'Upgrade-Insecure-Requests': '1',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36',
+}
+
+
+class ScrapingError(ValueError):
+    """Specific error class for scraping problems"""
+    pass
 
 
 def get_aps(url: str, **kwargs):
@@ -112,6 +130,10 @@ class IssueScraper(Scraper):
             author = x.css('h6[class="authors"]::text').extract_first()
             teaser = x.css('[class="teaser"]').css('p::text').extract_first()
             pdf_url = x.css('a[class="tiny button left-button"]::attr(href)').extract_first()
+            if not url.startswith(URL.Root):
+                url = URL.Root + url
+            if not pdf_url.startswith(URL.Root):
+                pdf_url = URL.Root + pdf_url
             return ArticleInfo(name=name, author=author, teaser=teaser, url=url, pdf_url=pdf_url)
         elif tag == 'section':
             name = x.css('h4::text').extract_first()
@@ -129,3 +151,19 @@ class IssueScraper(Scraper):
         items = results.xpath('(h2|div|section)')
         parsed = [self._extract_issue_item(i) for i in items]
         return parsed
+
+
+def download_pdf(pdf_url: str, out_file: str):
+    """Download the PDF file and store in a specific location
+
+    Args:
+        pdf_url: 
+            str, the url of the PDF
+        out_file: 
+            str, the filepath of the output PDF file
+    """
+    response = requests.get(pdf_url, headers=DOWNLOAD_HEADERS, cookies=auth.cookies())
+    if not response.status_code == 200:
+        raise ScrapingError('PDF download failed with error: {}'.format(response.reason))
+    with open(out_file, 'wb') as fid:
+        fid.write(response.content)
