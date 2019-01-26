@@ -32,3 +32,6 @@ Issue('Physical Review Letters', 121, 6)
  Article('Ubiquitous Spin-Orbit Coupling in a Screw Dislocation with High Spin Coherency')]
 ```
  
+ ## Disclaimer
+ Any user of this code must abide by the [Terms and Conditions](https://journals.aps.org/info/terms.html) of the APS website.
+ 
