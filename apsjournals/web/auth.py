@@ -2,7 +2,7 @@
 """
 
 
-from apsjournals.web.constants import EndPoint, URL
+from apsjournals.web.constants import EndPoint
 import requests
 import scrapy
 
