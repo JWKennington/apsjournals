@@ -54,10 +54,10 @@ class ScraperTests(unittest.TestCase):
         with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Volume)):
             s = scrapers.VolumeIndexScraper()
             info = s.load(journal='prl', volume=None)
-            self.assertEqual(info[0], scrapers.VolumeInfo(url='https://journals.aps.org/prl/issues/122', num=122, start=datetime.date(2019, 1, 1), end=datetime.date(2019, 1, 1)))
+            self.assertEqual(info[0], scrapers.VolumeInfo(url='https://journals.aps.org/prl/issues/122', num=122, start=datetime.date(2019, 1, 1), end=datetime.date(2019, 2, 1)))
 
             info = s.load(journal='prl', volume=121)
-            self.assertEqual(info[0], scrapers.VolumeInfo(url='https://journals.aps.org/prl/issues/122', num=122, start=datetime.date(2019, 1, 1), end=datetime.date(2019, 1, 1)))
+            self.assertEqual(info[0], scrapers.VolumeInfo(url='https://journals.aps.org/prl/issues/122', num=122, start=datetime.date(2019, 1, 1), end=datetime.date(2019, 2, 1)))
 
     def test_issue_index_scraper(self):
         with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Volume)):
