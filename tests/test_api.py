@@ -1,11 +1,9 @@
-
-
 import functools
 import mock
 import unittest
 from apsjournals import api
 from apsjournals.web.constants import EndPoint
-from apsjournals.web.tests.test_scrapers import get_aps_static
+from tests.test_scrapers import get_aps_static
 
 
 class JournalTests(unittest.TestCase):
@@ -56,6 +54,26 @@ class IssueTests(unittest.TestCase):
 
     def test_contents(self):
         with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Issue)):
-            contents = self.i.contents
-        self.assertEqual(repr(contents), "[Section(HIGHLIGHTED ARTICLES, 6 members), Section(LETTERS, 10 members)]")
+            contents = list(self.i.contents())[:2]
+        self.assertEqual(repr(contents), "[Section(HIGHLIGHTED ARTICLES, 6 members), Article('Magnetic Levitation Stabilized by Streaming Fluid Flows')]")
+        
 
+class ArticleTests(unittest.TestCase):
+    def setUp(self):
+        self.j = api.Journal('PRL', 'prl', 'PRL Desc')
+        with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Volume)):
+            self.v = self.j.volume(121)
+
+        with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Volume)):
+            self.i = self.v.issue(6)
+
+        with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Issue)):
+            self.contents = list(self.i.contents())
+        self.a = self.contents[0].members[0]
+
+    def test_article_repr(self):
+        self.assertEqual(str(self.a), "Article('Magnetic Levitation Stabilized by Streaming Fluid Flows')")
+
+    def test_url(self):
+        self.assertEqual(self.a.url, "https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.121.064502")
+        self.assertEqual(self.a.pdf_url, "https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.121.064502")

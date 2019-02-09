@@ -1,4 +1,7 @@
+fpdf
+inflection
 mock
 nose
+pypdf2
 requests
 scrapy

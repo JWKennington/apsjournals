@@ -14,7 +14,7 @@ to help explore some of the available data.
 Future versions of `apsjournals` will offer such behavior.
 1. Why not? Interacting with APS publications via Python is fun.
 
-## Loading Articles 
+## Loading Articles for a Journal Issue
 The `apsjournals` library offers several ways to load articles. The easiest of which
 is by picking a Journal, then specifying a volume and issue number. The library will then
 load the entire issue, including all articles. For example:
@@ -31,7 +31,47 @@ Issue('Physical Review Letters', 121, 6)
  Article('First Six Dimensional Phase Space Measurement of an Accelerator Beam'),
  Article('Ubiquitous Spin-Orbit Coupling in a Screw Dislocation with High Spin Coherency')]
 ```
- 
+
+## Download Journal Articles
+In addition to surveying which articles are in an issue, `apsjournals` is also capable of downloading 
+articles, either individually or as an entire issue. In the latter case, a cover page and table of contents
+will also be added to the pdf (including appropriately linked bookmarks).
+
+### Authentication
+The first step to downloading articles is authentication. You _must_ be a valid APS member. this library
+abides by all APS Terms and Conditions, and consequently relies on you for credentials to access
+APS material. Authentication can be performed by using the `authenticate` function:
+
+```python
+>>> import apsjournals
+>>> apsjournals.authenticate('username', 'password')
+```
+
+This will set a session cookie required for pdf downloads. 
+
+### Downloading an Article
+After authenticating, it is then possible to download articles from an issue individually or as a whole.
+To download an individual article, use the `pdf` method of the `Article` instance.
+Specifically:
+
+```python
+>>> journal = apsjournals.PRL
+>>> issue = journal.issue(121, 6)
+>>> article = issue.articles[3]
+>>> article.pdf('path/to/file.pdf')
+```
+
+This will download the article as a pdf to the given location. 
+
+### Download an Entire Issue
+In order to download all the articles at once, simply use the `pdf` method of the `Issue` instance! For
+example:
+
+```python
+>>> issue.pdf('path/to/file.pdf')
+```
+
+
  ## Disclaimer
  Any user of this code must abide by the [Terms and Conditions](https://journals.aps.org/info/terms.html) of the APS website.
  
