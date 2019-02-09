@@ -31,7 +31,7 @@ Issue('Physical Review Letters', 121, 6)
  Article('First Six Dimensional Phase Space Measurement of an Accelerator Beam'),
  Article('Ubiquitous Spin-Orbit Coupling in a Screw Dislocation with High Spin Coherency')]
 ```
- 
+
 ## Download Journal Articles
 In addition to surveying which articles are in an issue, `apsjournals` is also capable of downloading 
 articles, either individually or as an entire issue. In the latter case, a cover page and table of contents
@@ -72,4 +72,6 @@ example:
 ```
 
 
+ ## Disclaimer
+ Any user of this code must abide by the [Terms and Conditions](https://journals.aps.org/info/terms.html) of the APS website.
  
