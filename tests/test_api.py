@@ -1,5 +1,3 @@
-
-
 import functools
 import mock
 import unittest
@@ -56,8 +54,8 @@ class IssueTests(unittest.TestCase):
 
     def test_contents(self):
         with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Issue)):
-            contents = self.i.contents
-        self.assertEqual(repr(contents), "[Section(HIGHLIGHTED ARTICLES, 6 members), Section(LETTERS, 10 members)]")
+            contents = list(self.i.contents())[:2]
+        self.assertEqual(repr(contents), "[Section(HIGHLIGHTED ARTICLES, 6 members), Article('Magnetic Levitation Stabilized by Streaming Fluid Flows')]")
         
 
 class ArticleTests(unittest.TestCase):
@@ -70,7 +68,7 @@ class ArticleTests(unittest.TestCase):
             self.i = self.v.issue(6)
 
         with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Issue)):
-            self.contents = self.i.contents
+            self.contents = list(self.i.contents())
         self.a = self.contents[0].members[0]
 
     def test_article_repr(self):

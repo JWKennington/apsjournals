@@ -1,8 +1,8 @@
-
-
 import functools
 import mock
+import os
 import pathlib
+import PyPDF2 as pypdf
 import unittest
 import apsjournals
 from apsjournals.web.constants import EndPoint
@@ -29,3 +29,7 @@ class PdfTests(unittest.TestCase):
                 issue = apsjournals.PRL.issue(121, 6)
             with mock.patch('apsjournals.web.scrapers.get_aps', side_effect=functools.partial(get_aps_static, ep=EndPoint.Issue)):
                 issue.pdf((PDF_ROOT / 'test.pdf').as_posix())
+        with open((PDF_ROOT / 'test.pdf').as_posix(), 'rb') as pre_fid:
+            reader = pypdf.PdfFileReader(pre_fid)
+            self.assertEqual(reader.getNumPages(), 181)
+        os.remove((PDF_ROOT / 'test.pdf').as_posix()) # cleanup

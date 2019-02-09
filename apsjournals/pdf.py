@@ -19,6 +19,7 @@ BookmarkMeta = collections.namedtuple('BookmarkMeta', 'name page parent')
 
 
 def clean_path(path: str):
+    """Clean path for pdf article"""
     return path.replace(',', '')
 
 
@@ -50,6 +51,7 @@ def get_issue_meta(issue, dir: str, throttle: int=2) -> typing.List[ArticleMeta]
 
 
 class ApsPDF(fpdf.FPDF):
+    """Create a PDF of all issue contents with Table of Contents"""
     def __init__(self, issue, out_file, orientation='P',unit='mm',format='letter'):
         super().__init__(orientation=orientation, unit=unit, format=format)
         self.alias_nb_pages()
@@ -103,6 +105,7 @@ class ApsPDF(fpdf.FPDF):
     #######################  ADDITIONAL  PAGES  #######################
 
     def add_page_cover(self):
+        """Add cover page"""
         self.add_page()
         self.cell(0, 50, '', ln=1)  # padding
         self.set_font_size(20)
@@ -111,6 +114,7 @@ class ApsPDF(fpdf.FPDF):
         # self.cell(0, 170, '', ln=1)  # padding
 
     def add_page_contents(self, meta_cache):
+        """Add Table of Contents"""
         self.add_page()
         max_authors = 10
         line_items = list(self._meta_issue.contents(True))
@@ -145,6 +149,7 @@ class ApsPDF(fpdf.FPDF):
     ####################### META INFO BUILDERS #######################
 
     def add_bookmarks(self):
+        """Add bookmarks to document"""
         with open(self._meta_out_file, 'wb') as out_fid:
             with open(self._meta_pre_path, 'rb') as pre_fid:
                 reader = pypdf.PdfFileReader(pre_fid)
@@ -162,7 +167,6 @@ class ApsPDF(fpdf.FPDF):
                         writer.addBookmark('Contents', 1)
                     elif n in page_bookmarks:
                         for bookmark in page_bookmarks[n]:
-                            print('Adding Bookmark: ' + bookmark.name)
                             bookmark_handle = writer.addBookmark(bookmark.name, bookmark.page, parent=bookmark_cache.get(bookmark.parent, None)) 
                             bookmark_cache[bookmark] = bookmark_handle
                     # if n in page_links: # TODO resolve the mismatched placement of the links
@@ -172,11 +176,13 @@ class ApsPDF(fpdf.FPDF):
                 writer.write(out_fid)
 
     def cleanup(self):
+        """Remove the temp file"""
         os.remove(self._meta_pre_path)
 
     ####################### PRIMARY INTERFACE BUILD #######################
 
     def build(self):
+        """Build the pdf"""
         with tempfile.TemporaryDirectory('.aps-tmp') as tmp:
             # Build issue 
             metas = get_issue_meta(self._meta_issue, str(tmp))
