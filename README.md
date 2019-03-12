@@ -72,6 +72,6 @@ example:
 ```
 
 
- ## Disclaimer
- Any user of this code must abide by the [Terms and Conditions](https://journals.aps.org/info/terms.html) of the APS website.
+## Disclaimer
+Any user of this code must abide by the [Terms and Conditions](https://journals.aps.org/info/terms.html) of the APS website.
  
