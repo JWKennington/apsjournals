@@ -16,8 +16,3 @@ PRApplied = api.Journal('Physical Review Applied', 'prapplied')
 PRFluids = api.Journal('Physical Review Fluids', 'prfluids')
 PRMaterials = api.Journal('Physical Review Materials', 'prmaterials')
 PRPER = api.Journal('Physical Review Physics Education Research', 'prper')
-
-
-
-
-
